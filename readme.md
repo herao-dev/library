@@ -48,25 +48,8 @@
 
 ### 3.2 管理员页面
 
-| 页面名称 | 路由 | 模板文件 | 功能描述 |
-|---------|------|---------|---------|
-| **管理后台首页** | `/admin/dashboard` | `admin/dashboard.html` | 统计概览：图书/用户/在借/逾期/预约/评论/罚金统计 + 最新动态 |
-| **图书列表** | `/admin/books` | `admin/book_list.html` | 图书表格展示，支持搜索、分类筛选、分页 |
-| **添加图书** | `/admin/books/add` | `admin/book_form.html` | 图书信息录入表单（书名、作者、ISBN、分类、库存等） |
-| **编辑图书** | `/admin/books/<id>/edit` | `admin/book_form.html` | 复用添加表单，预填已有数据 |
-| **图书详情** | `/admin/books/<id>` | `admin/book_detail.html` | 图书完整信息 + 借阅记录 |
-| **分类管理** | `/admin/categories` | `admin/category_list.html` | 图书分类的增删改 |
-| **用户列表** | `/admin/users` | `admin/user_list.html` | 用户表格展示，支持搜索、分页 |
-| **添加用户** | `/admin/users/add` | `admin/user_form.html` | 管理员手动添加用户 |
-| **编辑用户** | `/admin/users/<id>/edit` | `admin/user_form.html` | 编辑用户信息、重置密码 |
-| **借阅管理** | `/admin/borrows` | `admin/borrow_list.html` | 所有借阅记录，支持按状态筛选（借出/已还/逾期），显示罚金 |
-| **借书操作** | `/admin/borrows/add` | `admin/borrow_form.html` | 选择用户 + 选择图书，创建借阅记录 |
-| **还书操作** | `/admin/borrows/<id>/return` | — | 确认归还，自动计算逾期罚金，更新库存 |
-| **预约管理** | `/admin/reservations` | `admin/reservation_list.html` | 查看所有预约记录，支持按状态筛选、取消预约 |
-| **评论管理** | `/admin/reviews` | `admin/review_list.html` | 查看所有评论，支持显示/隐藏、删除评论 |
-| **公告管理** | `/admin/announcements` | `admin/announcement_list.html` | 公告列表，支持发布/编辑/上下架/删除 |
-| **发布公告** | `/admin/announcements/add` | `admin/announcement_form.html` | 公告发布表单（标题、内容、优先级） |
-| **编辑公告** | `/admin/announcements/<id>/edit` | `admin/announcement_form.html` | 编辑已有公告 |
+<img width="1247" height="608" alt="58e48885ce436290778759a926a0c770" src="https://github.com/user-attachments/assets/b39adf8d-db26-4c57-b9eb-f2a82596dbd5" />
+
 
 ### 3.3 普通用户页面
 
