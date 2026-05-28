@@ -16,9 +16,15 @@
 | **表单处理** | Flask-WTF | 表单验证与 CSRF 保护 |
 | **用户认证** | Flask-Login | 会话管理与登录状态 |
 | **密码加密** | Werkzeug Security | 密码哈希 |
+| **前端框架** | Vue 3 + TypeScript | SPA 单页应用 |
+| **前端构建** | Vite | 前端构建工具 |
+| **前端路由** | Vue Router | 前端路由管理 |
+| **前端状态** | Pinia | 状态管理 |
 | **前端样式** | Bootstrap 5 | 响应式 UI 框架 |
 | **前端图标** | Bootstrap Icons | 图标库 |
 | **分页** | Flask-SQLAlchemy 内置分页 | 数据分页 |
+
+项目包含两套前端界面：Jinja2 模板渲染页面（`templates/`）和 Vue 3 SPA 单页应用（`frontend/`）。
 
 ---
 
