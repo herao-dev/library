@@ -1,0 +1,1 @@
+import{h as e}from"./index-BrsRkoHc.js";const a=()=>e.get("/user/profile"),o=s=>e.put("/user/profile",s),n=s=>e.post("/user/change-password",s),p=s=>e.get("/admin/users",{params:s}),u=s=>e.post("/admin/users",s),c=(s,t)=>e.put(`/admin/users/${s}`,t),g=s=>e.put(`/admin/users/${s}/toggle`);export{u as a,a as b,n as c,c as d,p as g,g as t,o as u};

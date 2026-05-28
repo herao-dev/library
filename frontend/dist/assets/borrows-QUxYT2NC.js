@@ -1,0 +1,1 @@
+import{h as r}from"./index-BrsRkoHc.js";const t=o=>r.get("/user/borrows",{params:o}),n=o=>r.post(`/user/borrows/${o}/return`),e=o=>r.get("/admin/borrows",{params:o}),a=o=>r.post("/admin/borrows",o),w=o=>r.post(`/admin/borrows/${o}/return`);export{w as a,t as b,a as c,e as g,n as r};

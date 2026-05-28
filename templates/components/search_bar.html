@@ -1,0 +1,13 @@
+<form class="search-bar" method="GET">
+    <div class="input-group">
+        <input type="text" name="search" class="form-control" placeholder="搜索..." value="{{ search or '' }}">
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-search"></i> 搜索
+        </button>
+        {% if search %}
+        <a href="{{ url_for(request.endpoint) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> 清除
+        </a>
+        {% endif %}
+    </div>
+</form>

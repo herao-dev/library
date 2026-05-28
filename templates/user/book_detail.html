@@ -1,0 +1,181 @@
+{% extends "layouts/user.html" %}
+
+{% block title %}{{ book.title }} - 图书详情{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">首页</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('user.book_list') }}">图书浏览</a></li>
+        <li class="breadcrumb-item active">{{ book.title }}</li>
+    </ol>
+</nav>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if book.cover_image %}
+                <img src="{{ url_for('static', filename=book.cover_image) }}" class="img-fluid rounded mb-3" alt="{{ book.title }}">
+                {% else %}
+                <i class="bi bi-book text-secondary mb-3" style="font-size: 8rem;"></i>
+                {% endif %}
+                <h5>{{ book.title }}</h5>
+                <p class="text-muted">{{ book.author }}</p>
+                {% if avg_rating > 0 %}
+                <div class="text-warning mb-2">
+                    {% for i in range(5) %}
+                    <i class="bi {{ 'bi-star-fill' if (avg_rating - i) >= 0.75 else ('bi-star-half' if (avg_rating - i) >= 0.25 else 'bi-star') }}"></i>
+                    {% endfor %}
+                    <small class="text-muted">({{ avg_rating }})</small>
+                </div>
+                {% endif %}
+                {% if book.is_available %}
+                    {% if my_borrow %}
+                    <form method="POST" action="{{ url_for('user.borrow_return', record_id=my_borrow.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-circle"></i> 归还此书
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('user.book_borrow', book_id=book.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-cart-plus"></i> 借阅此书
+                        </button>
+                    </form>
+                    {% endif %}
+                {% else %}
+                    {% if my_reservation %}
+                    <form method="POST" action="{{ url_for('user.reservation_cancel', reservation_id=my_reservation.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-x-circle"></i> 取消预约
+                        </button>
+                    </form>
+                    <small class="text-muted">您已预约该书，排队等待中</small>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('user.book_reserve', book_id=book.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-bookmark-plus"></i> 预约此书
+                        </button>
+                    </form>
+                    <small class="text-muted">当前库存不足，可预约排队</small>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">图书信息</h6></div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr><th class="table-light" style="width: 100px;">ISBN</th><td>{{ book.isbn or '-' }}</td></tr>
+                    <tr><th class="table-light">出版社</th><td>{{ book.publisher or '-' }}</td></tr>
+                    <tr><th class="table-light">出版日期</th><td>{{ book.publish_date.strftime('%Y-%m-%d') if book.publish_date else '-' }}</td></tr>
+                    <tr><th class="table-light">分类</th><td>{{ book.category.name if book.category else '-' }}</td></tr>
+                    <tr><th class="table-light">可借数量</th><td><span class="badge bg-success">{{ book.available_copies }}</span> / {{ book.total_copies }}</td></tr>
+                    <tr><th class="table-light">馆藏位置</th><td>{{ book.location or '-' }}</td></tr>
+                    <tr><th class="table-light">简介</th><td>{{ book.description or '暂无简介' }}</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-chat-square-text"></i> 读者评论 ({{ reviews|length }})</h6>
+                {% if has_borrowed and not my_review %}
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <i class="bi bi-pencil"></i> 写评论
+                </button>
+                {% elif my_review %}
+                <span class="text-muted small">您已评论</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if reviews %}
+                {% for review in reviews %}
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ review.user.username }}</strong>
+                            <small class="text-muted">{{ review.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <div class="text-warning">
+                            {% for i in range(5) %}
+                            <i class="bi {{ 'bi-star-fill' if i < review.rating else 'bi-star' }} small"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if review.content %}
+                    <p class="mb-0 mt-1">{{ review.content }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center mb-0">暂无评论，来成为第一个评论者吧！</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('user.book_review', book_id=book.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">评论《{{ book.title }}》</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">评分</label>
+                        <div class="rating-input d-flex gap-1">
+                            {% for i in range(1, 6) %}
+                            <label class="rating-label" style="cursor: pointer; font-size: 1.5rem;">
+                                <input type="radio" name="rating" value="{{ i }}" class="d-none" {{ 'checked' if i == 5 }}>
+                                <i class="bi bi-star text-muted"></i>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewContent" class="form-label">评论内容</label>
+                        <textarea class="form-control" id="reviewContent" name="content" rows="4" placeholder="说说您对这本书的看法..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">发表评论</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.rating-label input').forEach(input => {
+    input.addEventListener('change', function() {
+        const labels = this.closest('.rating-input').querySelectorAll('.rating-label');
+        const val = parseInt(this.value);
+        labels.forEach((label, index) => {
+            const icon = label.querySelector('i');
+            const rval = parseInt(label.querySelector('input').value);
+            if (rval <= val) {
+                icon.className = 'bi bi-star-fill text-warning';
+            } else {
+                icon.className = 'bi bi-star text-muted';
+            }
+        });
+    });
+    if (input.checked) {
+        input.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+{% endblock %}

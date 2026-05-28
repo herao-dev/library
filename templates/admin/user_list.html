@@ -1,0 +1,87 @@
+{% extends "layouts/admin.html" %}
+{% from "components/pagination.html" import render_pagination %}
+
+{% block title %}用户管理 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-people"></i> 用户管理</h4>
+    <a href="{{ url_for('admin.user_add') }}" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> 添加用户
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="GET" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="搜索用户名/邮箱..." value="{{ search }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> 搜索</button>
+            </div>
+            {% if search %}
+            <div class="col-md-2">
+                <a href="{{ url_for('admin.user_list') }}" class="btn btn-outline-secondary w-100">清除</a>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>角色</th>
+                        <th>手机号</th>
+                        <th>状态</th>
+                        <th>注册时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-warning text-dark' if user.is_admin else 'bg-info' }}">
+                                {{ '管理员' if user.is_admin else '用户' }}
+                            </span>
+                        </td>
+                        <td>{{ user.phone or '-' }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-success' if user.is_active else 'bg-danger' }}">
+                                {{ '启用' if user.is_active else '禁用' }}
+                            </span>
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.user_edit', user_id=user.id) }}" class="btn btn-sm btn-warning" title="编辑">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('admin.user_toggle', user_id=user.id) }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm {{ 'btn-danger' if user.is_active else 'btn-success' }}" title="{{ '禁用' if user.is_active else '启用' }}">
+                                    <i class="bi {{ 'bi-lock' if user.is_active else 'bi-unlock' }}"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ render_pagination(pagination, 'admin.user_list') }}
+        {% else %}
+        {% include "components/empty_state.html" %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

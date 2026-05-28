@@ -1,0 +1,56 @@
+<aside class="sidebar bg-dark text-white">
+    <div class="sidebar-header p-3">
+        <h5 class="mb-0"><i class="bi bi-book"></i> 管理后台</h5>
+    </div>
+    <hr class="text-secondary my-0">
+    <nav class="sidebar-nav p-2">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> 控制台
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.book') }}" href="{{ url_for('admin.book_list') }}">
+                    <i class="bi bi-journal-bookmark"></i> 图书管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.category') }}" href="{{ url_for('admin.category_list') }}">
+                    <i class="bi bi-tags"></i> 分类管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.user') }}" href="{{ url_for('admin.user_list') }}">
+                    <i class="bi bi-people"></i> 用户管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.borrow') }}" href="{{ url_for('admin.borrow_list') }}">
+                    <i class="bi bi-arrow-left-right"></i> 借阅管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.reservation') }}" href="{{ url_for('admin.reservation_list') }}">
+                    <i class="bi bi-bookmark-check"></i> 预约管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.review') }}" href="{{ url_for('admin.review_list') }}">
+                    <i class="bi bi-chat-square-text"></i> 评论管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ 'active' if request.endpoint and request.endpoint.startswith('admin.announcement') }}" href="{{ url_for('admin.announcement_list') }}">
+                    <i class="bi bi-megaphone"></i> 公告管理
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <hr class="text-secondary my-0">
+    <div class="sidebar-footer p-3">
+        <a href="{{ url_for('user.dashboard') }}" class="text-white-50 text-decoration-none">
+            <i class="bi bi-house"></i> 返回前台
+        </a>
+    </div>
+</aside>

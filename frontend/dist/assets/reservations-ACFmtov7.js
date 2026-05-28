@@ -1,0 +1,1 @@
+import{h as s}from"./index-BrsRkoHc.js";const a=e=>s.get("/user/reservations",{params:e}),n=e=>s.post(`/user/reservations/${e}/cancel`),o=e=>s.get("/admin/reservations",{params:e}),r=e=>s.post(`/admin/reservations/${e}/cancel`);export{r as a,a as b,n as c,o as g};

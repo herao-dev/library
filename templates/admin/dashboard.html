@@ -1,0 +1,199 @@
+{% extends "layouts/admin.html" %}
+{% block title %}控制台 - 管理后台{% endblock %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-speedometer2"></i> 控制台</h4>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">图书总数</h6>
+                        <h2 class="mb-0">{{ total_books }}</h2>
+                    </div>
+                    <i class="bi bi-journal-bookmark" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">用户总数</h6>
+                        <h2 class="mb-0">{{ total_users }}</h2>
+                    </div>
+                    <i class="bi bi-people" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">在借数量</h6>
+                        <h2 class="mb-0">{{ borrowed_count }}</h2>
+                    </div>
+                    <i class="bi bi-arrow-left-right" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">逾期数量</h6>
+                        <h2 class="mb-0">{{ overdue_count }}</h2>
+                    </div>
+                    <i class="bi bi-exclamation-triangle" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">分类数量</h6>
+                <h3 class="text-info mb-0">{{ total_categories }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">待处理预约</h6>
+                <h3 class="text-warning mb-0">{{ total_reservations }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">评论总数</h6>
+                <h3 class="text-success mb-0">{{ total_reviews }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">累计罚金</h6>
+                <h3 class="text-danger mb-0">¥{{ "%.2f"|format(total_fines) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-clock-history"></i> 最近借阅记录</h6>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_borrows %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>用户</th>
+                                <th>图书</th>
+                                <th>状态</th>
+                                <th>借阅日期</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in recent_borrows %}
+                            <tr>
+                                <td>{{ record.user.username }}</td>
+                                <td>{{ record.book.title }}</td>
+                                <td>
+                                    {% import "components/status_badge.html" as sb %}
+                                    {{ sb.status_badge(record.status) }}
+                                </td>
+                                <td>{{ record.borrow_date.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                {% include "components/empty_state.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-chat-square-text"></i> 最新评论</h6>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_reviews %}
+                <div class="list-group list-group-flush">
+                    {% for review in recent_reviews %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ review.user.username }}</strong>
+                                <small class="text-muted">评《{{ review.book.title }}》</small>
+                            </div>
+                            <small class="text-muted">{{ review.created_at.strftime('%m-%d') }}</small>
+                        </div>
+                        <div class="text-warning small">
+                            {% for i in range(5) %}
+                            <i class="bi {{ 'bi-star-fill' if i < review.rating else 'bi-star' }}"></i>
+                            {% endfor %}
+                        </div>
+                        {% if review.content %}
+                        <p class="mb-0 small text-muted">{{ review.content[:60] }}{% if review.content|length > 60 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {% include "components/empty_state.html" %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-megaphone"></i> 最新公告</h6>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_announcements %}
+                <div class="list-group list-group-flush">
+                    {% for a in latest_announcements %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span>
+                                {% if a.priority == 'urgent' %}
+                                <span class="badge bg-danger me-1">紧急</span>
+                                {% elif a.priority == 'important' %}
+                                <span class="badge bg-warning text-dark me-1">重要</span>
+                                {% endif %}
+                                {{ a.title }}
+                            </span>
+                            <small class="text-muted">{{ a.created_at.strftime('%m-%d') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {% include "components/empty_state.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

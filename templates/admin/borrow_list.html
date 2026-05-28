@@ -1,0 +1,83 @@
+{% extends "layouts/admin.html" %}
+{% from "components/pagination.html" import render_pagination %}
+{% import "components/status_badge.html" as sb %}
+
+{% block title %}借阅管理 - 管理后台{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-arrow-left-right"></i> 借阅管理</h4>
+    <a href="{{ url_for('admin.borrow_add') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> 办理借阅
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="GET" class="row g-2 mb-3">
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">全部状态</option>
+                    <option value="borrowed" {{ 'selected' if status_filter == 'borrowed' }}>借出</option>
+                    <option value="returned" {{ 'selected' if status_filter == 'returned' }}>已还</option>
+                    <option value="overdue" {{ 'selected' if status_filter == 'overdue' }}>逾期</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> 筛选</button>
+            </div>
+            {% if status_filter %}
+            <div class="col-md-2">
+                <a href="{{ url_for('admin.borrow_list') }}" class="btn btn-outline-secondary w-100">清除</a>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if records %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>借阅人</th>
+                        <th>图书</th>
+                        <th>借阅日期</th>
+                        <th>应还日期</th>
+                        <th>归还日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.user.username }}</td>
+                        <td>{{ record.book.title }}</td>
+                        <td>{{ record.borrow_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ record.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ record.return_date.strftime('%Y-%m-%d') if record.return_date else '-' }}</td>
+                        <td>{{ sb.status_badge(record.status) }}</td>
+                        <td>
+                            {% if record.status in ['borrowed', 'overdue'] %}
+                            <button class="btn btn-sm btn-success" onclick="confirmAction('确定要归还《{{ record.book.title }}》吗？', '{{ url_for('admin.borrow_return', record_id=record.id) }}')">
+                                <i class="bi bi-check-circle"></i> 还书
+                            </button>
+                            {% else %}
+                            <span class="text-muted">已归还</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ render_pagination(pagination, 'admin.borrow_list') }}
+        {% else %}
+        {% include "components/empty_state.html" %}
+        {% endif %}
+    </div>
+</div>
+
+{% include "components/confirm_modal.html" %}
+{% endblock %}

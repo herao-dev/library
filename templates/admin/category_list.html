@@ -1,0 +1,107 @@
+{% extends "layouts/admin.html" %}
+{% from "macros/form_field.html" import render_field %}
+
+{% block title %}分类管理 - 管理后台{% endblock %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-tags"></i> 分类管理</h4>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">添加分类</h6></div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ render_field(form.name, placeholder="请输入分类名称") }}
+                    {{ render_field(form.description, placeholder="请输入分类描述", rows="3") }}
+                    {{ form.submit(class="btn btn-primary w-100") }}
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">分类列表</h6></div>
+            <div class="card-body p-0">
+                {% if categories %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>描述</th>
+                                <th>图书数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in categories %}
+                            <tr>
+                                <td>{{ cat.id }}</td>
+                                <td>{{ cat.name }}</td>
+                                <td>{{ cat.description or '-' }}</td>
+                                <td>{{ cat.books.count() }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" onclick="editCategory({{ cat.id }}, '{{ cat.name }}', '{{ cat.description or '' }}')">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmAction('确定要删除分类「{{ cat.name }}」吗？', '{{ url_for('admin.category_delete', category_id=cat.id) }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                {% include "components/empty_state.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editCategoryForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑分类</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">分类名称</label>
+                        <input type="text" name="name" id="editCatName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">分类描述</label>
+                        <textarea name="description" id="editCatDesc" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include "components/confirm_modal.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editCategory(id, name, desc) {
+    document.getElementById('editCategoryForm').action = '/admin/categories/' + id + '/edit';
+    document.getElementById('editCatName').value = name;
+    document.getElementById('editCatDesc').value = desc;
+    new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1 @@
+import{h as e}from"./index-BrsRkoHc.js";const a=n=>e.get("/admin/announcements",{params:n}),m=n=>e.post("/admin/announcements",n),s=(n,t)=>e.put(`/admin/announcements/${n}`,t),c=n=>e.put(`/admin/announcements/${n}/toggle`),u=n=>e.delete(`/admin/announcements/${n}`);export{m as c,u as d,a as g,c as t,s as u};

@@ -1,0 +1,63 @@
+{% extends "layouts/user.html" %}
+{% from "components/pagination.html" import render_pagination %}
+
+{% block title %}我的预约 - 图书管理系统{% endblock %}
+
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-bookmark-check"></i> 我的预约</h4>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if reservations %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>图书</th>
+                        <th>作者</th>
+                        <th>预约日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservations %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('user.book_detail', book_id=r.book_id) }}">{{ r.book.title }}</a>
+                        </td>
+                        <td>{{ r.book.author }}</td>
+                        <td>{{ r.reserve_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            {% if r.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">待处理</span>
+                            {% elif r.status == 'fulfilled' %}
+                            <span class="badge bg-success">已满足</span>
+                            {% elif r.status == 'cancelled' %}
+                            <span class="badge bg-secondary">已取消</span>
+                            {% else %}
+                            <span class="badge bg-dark">已过期</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if r.status == 'pending' %}
+                            <form method="POST" action="{{ url_for('user.reservation_cancel', reservation_id=r.id) }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger">取消预约</button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {{ render_pagination(pagination, 'user.reservation_list') }}
+        {% else %}
+        {% include "components/empty_state.html" %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

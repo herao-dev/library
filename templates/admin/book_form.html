@@ -1,0 +1,67 @@
+{% extends "layouts/admin.html" %}
+{% from "macros/form_field.html" import render_field %}
+
+{% block title %}{{ title }} - 管理后台{% endblock %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-journal-bookmark"></i> {{ title }}</h4>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ render_field(form.title, placeholder="请输入书名") }}
+                </div>
+                <div class="col-md-6">
+                    {{ render_field(form.author, placeholder="请输入作者") }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ render_field(form.isbn, placeholder="请输入ISBN号") }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(form.publisher, placeholder="请输入出版社") }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(form.publish_date) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ render_field(form.category_id) }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(form.total_copies) }}
+                </div>
+                <div class="col-md-4">
+                    {{ render_field(form.available_copies) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ render_field(form.location, placeholder="如：A-01-01") }}
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">封面图片</label>
+                        <input type="file" name="cover_image" class="form-control" accept="image/*">
+                        {% if book and book.cover_image %}
+                        <div class="mt-2">
+                            <img src="{{ url_for('static', filename=book.cover_image) }}" class="img-thumbnail" style="max-height: 100px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {{ render_field(form.description, placeholder="请输入图书简介", rows="4") }}
+            <div class="d-flex gap-2">
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('admin.book_list') }}" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

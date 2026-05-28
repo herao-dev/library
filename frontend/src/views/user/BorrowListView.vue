@@ -1,0 +1,75 @@
+<template>
+  <div>
+    <h2 style="margin-bottom:16px">我的借阅</h2>
+    <div style="margin-bottom:16px">
+      <el-radio-group v-model="statusFilter" @change="fetchData">
+        <el-radio-button label="">全部</el-radio-button>
+        <el-radio-button label="borrowed">借出</el-radio-button>
+        <el-radio-button label="overdue">逾期</el-radio-button>
+        <el-radio-button label="returned">已还</el-radio-button>
+      </el-radio-group>
+    </div>
+
+    <el-table :data="records" stripe>
+      <el-table-column prop="book" label="图书" />
+      <el-table-column prop="author" label="作者" width="120" />
+      <el-table-column prop="borrow_date" label="借阅日期" width="120">
+        <template #default="{ row }">{{ row.borrow_date?.slice(0, 10) }}</template>
+      </el-table-column>
+      <el-table-column prop="due_date" label="应还日期" width="120">
+        <template #default="{ row }">{{ row.due_date?.slice(0, 10) }}</template>
+      </el-table-column>
+      <el-table-column prop="return_date" label="归还日期" width="120">
+        <template #default="{ row }">{{ row.return_date?.slice(0, 10) || '-' }}</template>
+      </el-table-column>
+      <el-table-column prop="status" label="状态" width="80">
+        <template #default="{ row }">
+          <el-tag :type="statusType(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="fine" label="罚金" width="80">
+        <template #default="{ row }">¥{{ row.fine }}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="100">
+        <template #default="{ row }">
+          <el-button v-if="row.status !== 'returned'" type="primary" size="small" @click="handleReturn(row)">归还</el-button>
+          <span v-else style="color:#94A3B8">已归还</span>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <div style="text-align:center;margin-top:20px">
+      <el-pagination v-model:current-page="page" :page-size="10" :total="total" layout="prev,pager,next" @current-change="fetchData" />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { getBorrows, returnBook } from '@/api/borrows'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { BorrowRecord } from '@/types'
+
+const records = ref<BorrowRecord[]>([])
+const statusFilter = ref('')
+const page = ref(1)
+const total = ref(0)
+
+function statusType(s: string) { return { borrowed: 'warning', overdue: 'danger', returned: 'success' }[s] || 'info' }
+function statusText(s: string) { return { borrowed: '借出', overdue: '逾期', returned: '已还' }[s] || s }
+
+async function fetchData() {
+  const res = await getBorrows({ page: page.value, status: statusFilter.value })
+  records.value = res.data
+  total.value = res.pagination.total
+}
+
+async function handleReturn(row: BorrowRecord) {
+  await ElMessageBox.confirm(`确认归还《${row.book}》？`, '确认归还')
+  await returnBook(row.id)
+  ElMessage.success('归还成功')
+  fetchData()
+}
+
+onMounted(() => fetchData())
+</script>

@@ -1,0 +1,1 @@
+import{h as s}from"./index-BrsRkoHc.js";const e=()=>s.get("/user/dashboard"),o=()=>s.get("/admin/dashboard"),t=a=>s.get("/books/search",{params:{q:a}}),h=a=>s.get("/users/search",{params:{q:a}});export{e as a,h as b,o as g,t as s};

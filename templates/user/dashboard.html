@@ -1,0 +1,131 @@
+{% extends "layouts/user.html" %}
+{% import "components/status_badge.html" as sb %}
+
+{% block title %}我的首页 - 图书管理系统{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ borrowed_count }}</h3>
+                <small>当前在借</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ overdue_count }}</h3>
+                <small>逾期未还</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ total_borrowed }}</h3>
+                <small>累计借阅</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-0">{{ recent_books|length }}</h3>
+                <small>新书上架</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-clock-history"></i> 最近借阅</h6>
+                <a href="{{ url_for('user.borrow_list') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_borrows %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>图书</th><th>借阅日期</th><th>状态</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for record in recent_borrows %}
+                            <tr>
+                                <td>{{ record.book.title }}</td>
+                                <td>{{ record.borrow_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ sb.status_badge(record.status) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                {% include "components/empty_state.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-star"></i> 最新图书</h6>
+                <a href="{{ url_for('user.book_list') }}" class="btn btn-sm btn-outline-primary">浏览全部</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    {% for book in recent_books %}
+                    <div class="col-6">
+                        <a href="{{ url_for('user.book_detail', book_id=book.id) }}" class="text-decoration-none">
+                            <div class="d-flex align-items-center p-2 border rounded">
+                                <i class="bi bi-book text-primary me-2" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ book.title }}</div>
+                                    <small class="text-muted">{{ book.author }}</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if announcements %}
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-megaphone"></i> 最新公告</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for a in announcements %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                {% if a.priority == 'urgent' %}
+                                <span class="badge bg-danger me-1">紧急</span>
+                                {% elif a.priority == 'important' %}
+                                <span class="badge bg-warning text-dark me-1">重要</span>
+                                {% endif %}
+                                <strong>{{ a.title }}</strong>
+                            </div>
+                            <small class="text-muted">{{ a.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                        <p class="mb-0 mt-1 text-muted small">{{ a.content[:100] }}{% if a.content|length > 100 %}...{% endif %}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
